@@ -18,11 +18,11 @@ def main():
 
     args = parser.parse_args()
     if args.tip:
-        target_ip_validated = re.search(r"^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)(\.(?!$)|$)){4}$", args.target_ip)
-        if not bool(target_ip_validated):
+        tip_validated = re.search(r"^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)(\.(?!$)|$)){4}$", args.tip)
+        if not bool(tip_validated):
             print("Invalid target IP!")
             exit()
-        targets = [args.target_ip]
+        targets = [args.tip]
 
     else:
         if os.geteuid() != 0:
@@ -62,11 +62,11 @@ def main():
                     exit()
         
     if args.gwy:
-        gateway_validated = re.search(r"^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)(\.(?!$)|$)){4}$", args.gateway)
+        gateway_validated = re.search(r"^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)(\.(?!$)|$)){4}$", args.gwy)
         if not bool(gateway_validated):
             print("Invalid gateway IP!")
             exit()
-        gateway = args.gateway
+        gateway = args.gwy
     else:
         gateway = get_defult_gateway()
 
