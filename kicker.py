@@ -52,7 +52,7 @@ def main():
                 if not index.isdigit():
                     print("Invalid input at: "+ index)
                     exit()
-                if int(index) > len(ans) or int((index) < 1):
+                if int(index) > len(ans) or int(index) < 1:
                     print("Index out of bounds at: "+ index)
                     exit()
                 try:
