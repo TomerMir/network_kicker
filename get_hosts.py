@@ -20,26 +20,29 @@ def scan_and_print_neighbors(net, interface, timeout=5):
     try:
         ans, unans = arping(net, iface=interface, timeout=timeout, verbose=False)
         for s, r in ans.res:
-            hosts.append(r.psrc)
+            name = conf.manufdb._resolve_MAC(r.hwsrc[:8])
+            if name[2] == name[5] == ':':
+                name = ""
+            hosts.append((r.psrc, name))
         return hosts
     except Exception as e:
         return None
 
 
-def get_all_hosts(interface_to_scan=None):
+def get_defult_gateway():
+    packet = IP(dst="google.com", ttl=0)
+    ans = sr1(packet, verbose=False)
+    return ans.src
 
+def get_all_hosts():
     for network, netmask, _, interface, address, _ in conf.route.routes:
-
-        if interface_to_scan and interface_to_scan != interface:
-            continue
 
         if network == 0 or interface == 'lo' or address == '127.0.0.1' or address == '0.0.0.0':
             continue
 
         if netmask <= 0 or netmask == 0xFFFFFFFF:
             continue
-
-        net = to_CIDR_notation(network, netmask)
         
+        net = to_CIDR_notation(network, netmask)
         if net:
             return scan_and_print_neighbors(net, interface)

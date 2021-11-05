@@ -10,6 +10,8 @@ def get_defult_gateway():
     ans = sr1(packet, verbose=False)
     return ans.src
 
+GATEWAY = get_defult_gateway()
+
 def main():
     parser = argparse.ArgumentParser("ARP poisener")
 
@@ -36,14 +38,14 @@ def main():
         
         print(str(len(ans)) + " hosts found:\n")
         for i, host in enumerate(ans):
-            print(str(i+1) + ": " + host)
+            print(str(i+1) + ": " + host[0] + " " + host[1])
         
         targets = []
         print("Which host would you like to kick? Enter their indexes (starting from 1) seperated by space. (For example: 1 3 6)\nIf you want to attack all hosts enter \"all\"")
         hosts_to_kick = input()
 
         if(hosts_to_kick == "all"):
-            targets = ans
+            targets = [x[0] for x in ans]
 
         else:
             indexes = hosts_to_kick.split()
@@ -56,21 +58,20 @@ def main():
                     print("Index out of bounds at: "+ index)
                     exit()
                 try:
-                    targets.append(ans[int(index)-1])
+                    targets.append(ans[int(index)-1][0])
                 except Exception:
                     print("Invalid input")
                     exit()
-        
+    
+    global GATEWAY
     if args.gwy:
         gateway_validated = re.search(r"^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)(\.(?!$)|$)){4}$", args.gwy)
         if not bool(gateway_validated):
             print("Invalid gateway IP!")
             exit()
-        gateway = args.gwy
-    else:
-        gateway = get_defult_gateway()
+        GATEWAY = args.gwy
 
-    kick_hosts(targets, gateway)
+    kick_hosts(targets, GATEWAY)
 
 
 if __name__ == "__main__":
