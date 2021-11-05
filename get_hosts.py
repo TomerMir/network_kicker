@@ -34,15 +34,22 @@ def get_defult_gateway():
     ans = sr1(packet, verbose=False)
     return ans.src
 
-def get_all_hosts():
+def get_all_hosts(iface = None):
+    
     for network, netmask, _, interface, address, _ in conf.route.routes:
 
         if network == 0 or interface == 'lo' or address == '127.0.0.1' or address == '0.0.0.0':
             continue
 
+        if iface and iface != interface:
+            continue
+
         if netmask <= 0 or netmask == 0xFFFFFFFF:
             continue
         
+        if not iface and interface != conf.iface:
+            continue
+
         net = to_CIDR_notation(network, netmask)
         if net:
             return scan_and_print_neighbors(net, interface)

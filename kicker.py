@@ -11,14 +11,27 @@ def get_defult_gateway():
     return ans.src
 
 GATEWAY = get_defult_gateway()
+IFNAME = None
 
 def main():
     parser = argparse.ArgumentParser("ARP poisener")
 
     parser.add_argument("--tip", help="""The IP of your target""", type=str)
     parser.add_argument("--gwy", help="""The IP of your target's gateway""", type=str)
+    parser.add_argument("--iface", help="""1 if you want to see and select the interface""", type=int)
 
     args = parser.parse_args()
+
+    global IFNAME
+
+    if args.iface and args.iface==1:
+        print("Available interfaces:\n")
+        print(get_if_list())
+        IFNAME = input("\nEnter your selected interface:\n")
+        if IFNAME not in get_if_list():
+            print("Invalid interface")
+            exit()
+    
     if args.tip:
         tip_validated = re.search(r"^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)(\.(?!$)|$)){4}$", args.tip)
         if not bool(tip_validated):
@@ -31,7 +44,7 @@ def main():
             print("You need to be root to search hosts...\nYou can run this script with the --tip parameter to set the target ip manualy ")
             exit()
         print("Serching for online hosts...\n")
-        ans = get_all_hosts()
+        ans = get_all_hosts(IFNAME)
         if not ans or len(ans) == 0:
             print("No hosts...")
             exit()
@@ -70,6 +83,7 @@ def main():
             print("Invalid gateway IP!")
             exit()
         GATEWAY = args.gwy
+
 
     kick_hosts(targets, GATEWAY)
 
